@@ -17,7 +17,7 @@ add_library(jnikit STATIC
         include/env.h
         include/class.h
         include/functions.h
-        include/exceptions.h include/objects.h include/array.h include/context.h)
+        include/exceptions.h include/objects.h include/array.h include/context.h include/jnikit.h)
 
 target_include_directories(jnikit PUBLIC
         ${JNI_INCLUDE_DIRS}
