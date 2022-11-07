@@ -1,22 +1,12 @@
 #pragma once
 
-#include <jni.h>
+#include <exception>
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+namespace jnikit {
 
-void jnikit_throw_out_of_memory(JNIEnv* env, const char* message);
+class JniException : std::exception {
 
-void jnikit_throw_unsupported(JNIEnv* env, const char* message);
+};
 
-void jnikit_throw_class_not_found(JNIEnv* env, const char* name);
-
-void jnikit_throw_method_not_found(JNIEnv* env, const char* name, const char* signature);
-
-void jnikit_throw_field_not_found(JNIEnv* env, const char* name, const char* signature);
-
-#ifdef __cplusplus
 }
-#endif

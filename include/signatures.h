@@ -1,48 +1,54 @@
 #pragma once
 
+#include <jni.h>
+#include "meta.h"
+#include "types.h"
 
-#define JNIKIT_BOOLEAN "Z"
-#define JNIKIT_CHAR "C"
-#define JNIKIT_BYTE "B"
-#define JNIKIT_SHORT "S"
-#define JNIKIT_INT "I"
-#define JNIKIT_LONG "J"
-#define JNIKIT_FLOAT "F"
-#define JNIKIT_DOUBLE "D"
-#define JNIKIT_OBJECT(type_name) "L" type_name ";"
 
-#define JNIKIT_ARRAY(type_signature) "[" type_signature
-#define JNIKIT_BOOLEANARRAY JNIKIT_ARRAY(JNIKIT_BOOLEAN)
-#define JNIKIT_BYTEARRAY JNIKIT_ARRAY(JNIKIT_BYTE)
-#define JNIKIT_CHARARRAY JNIKIT_ARRAY(JNIKIT_CHAR)
-#define JNIKIT_SHORTARRAY JNIKIT_ARRAY(JNIKIT_SHORT)
-#define JNIKIT_INTARRAY JNIKIT_ARRAY(JNIKIT_INT)
-#define JNIKIT_LONGARRAY JNIKIT_ARRAY(JNIKIT_LONG)
-#define JNIKIT_FLOATARRAY JNIKIT_ARRAY(JNIKIT_FLOAT)
-#define JNIKIT_DOUBLEARRAY JNIKIT_ARRAY(JNIKIT_DOUBLE)
-#define JNIKIT_OBJECTARRAY(type_name) JNIKIT_ARRAY(JNIKIT_OBJECT(type_name))
+namespace jnikit::types {
 
-#define JNIKIT_METHOD(return_type_signature, ...) "(" __VA_ARGS__ ")" return_type_signature
-#define JNIKIT_VOIDMETHOD(...) JNIKIT_METHOD("V", __VA_ARGS__)
-#define JNIKIT_BOOLEANMETHOD(...) JNIKIT_METHOD(JNIKIT_BOOLEAN, __VA_ARGS__)
-#define JNIKIT_CHARMETHOD(...) JNIKIT_METHOD(JNIKIT_CHAR, __VA_ARGS__)
-#define JNIKIT_BYTEMETHOD(...) JNIKIT_METHOD(JNIKIT_BYTE, __VA_ARGS__)
-#define JNIKIT_SHORTMETHOD(...) JNIKIT_METHOD(JNIKIT_SHORT, __VA_ARGS__)
-#define JNIKIT_INTMETHOD(...) JNIKIT_METHOD(JNIKIT_INT, __VA_ARGS__)
-#define JNIKIT_LONGMETHOD(...) JNIKIT_METHOD(JNIKIT_LONG, __VA_ARGS__)
-#define JNIKIT_FLOATMETHOD(...) JNIKIT_METHOD(JNIKIT_FLOAT, __VA_ARGS__)
-#define JNIKIT_DOUBLEMETHOD(...) JNIKIT_METHOD(JNIKIT_DOUBLE, __VA_ARGS__)
-#define JNIKIT_OBJECTMETHOD(type_name, ...) JNIKIT_METHOD(JNIKIT_OBJECT(type_name), __VA_ARGS__)
+#define MAKE_SIGNATURE_CHAR(type, signature_char) \
+    template<> \
+    struct Signature<type> { \
+        constexpr auto operator()() const { \
+            return jnikit::meta::StringLiteral<signature_char>(); \
+        }\
+    };
 
-#define JNIKIT_ARRAYMETHOD(type_signature, ...) JNIKIT_METHOD(JNIKIT_ARRAY(type_signature), __VA_ARGS__)
-#define JNIKIT_BOOLEANARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_BOOLEANARRAY, __VA_ARGS__)
-#define JNIKIT_CHARARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_CHARARRAY, __VA_ARGS__)
-#define JNIKIT_BYTEARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_BYTEARRAY, __VA_ARGS__)
-#define JNIKIT_SHORTARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_SHORTARRAY, __VA_ARGS__)
-#define JNIKIT_INTARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_INTARRAY, __VA_ARGS__)
-#define JNIKIT_LONGARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_LONGARRAY, __VA_ARGS__)
-#define JNIKIT_FLOATARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_FLOATARRAY, __VA_ARGS__)
-#define JNIKIT_DOUBLEARRAYMETHOD(...) JNIKIT_METHOD(JNIKIT_DOUBLEARRAY, __VA_ARGS__)
-#define JNIKIT_OBJECTARRAYMETHOD(type_name, ...) JNIKIT_METHOD(JNIKIT_OBJECTARRAY(type_name), __VA_ARGS__)
+template<typename _type>
+struct Signature {};
 
-#define JNIKIT_STRING_TYPENAME "java/lang/String"
+MAKE_SIGNATURE_CHAR(Boolean, 'Z')
+MAKE_SIGNATURE_CHAR(Char, 'C')
+MAKE_SIGNATURE_CHAR(Byte, 'B')
+MAKE_SIGNATURE_CHAR(Short, 'S')
+MAKE_SIGNATURE_CHAR(Int, 'I')
+MAKE_SIGNATURE_CHAR(Long, 'J')
+MAKE_SIGNATURE_CHAR(Float, 'F')
+MAKE_SIGNATURE_CHAR(Double, 'D')
+MAKE_SIGNATURE_CHAR(Void, 'V')
+
+
+template<class _name_type>
+struct Signature<ObjectType<_name_type>> {
+    constexpr auto operator()() const {
+        return meta::concat(meta::StringLiteral<'L'>(), meta::StringLiteralSignature<_name_type>(), meta::StringLiteral<';'>());
+    }
+};
+
+template<typename _c_type, typename _inner_type>
+struct Signature<ArrayType<_c_type, _inner_type>> {
+    constexpr auto operator()() const {
+        return meta::concat(meta::StringLiteral<'['>(), Signature<_inner_type>()());
+    }
+};
+
+template<typename R, typename... Args>
+struct Signature<MethodType<R(Args...)>> {
+    constexpr auto operator()() const {
+        return meta::concat(meta::StringLiteral<'('>(), Signature<Args>()()..., meta::StringLiteral<')'>(),
+                Signature<R>()());
+    }
+};
+
+}
