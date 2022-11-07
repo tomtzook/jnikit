@@ -15,6 +15,10 @@ public:
         , m_instance(instance)
     {}
 
+    jobject object() {
+        return m_instance;
+    }
+
     Class<T>& getClass() {
         return m_cls;
     }
