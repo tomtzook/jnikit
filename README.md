@@ -9,8 +9,8 @@ A C++ toolkit for nicer work with JNI.
 DEFINE_OBJECT_TYPE(MyClass, "fully/qualified/name/MyClass");
 
 jobject create(jnikit::Env& env, jint arg1, jint arg2) {
-  auto clas = env.getClass<MyClass>();
-  return class.newInstance<jnikit::types::Int, jnikit::types::Int>(arg1, arg2);
+  auto cls = env.getClass<MyClass>();
+  return cls.newInstance<jnikit::types::Int, jnikit::types::Int>(arg1, arg2);
 }
 ```
 
