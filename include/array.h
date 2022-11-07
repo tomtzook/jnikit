@@ -19,15 +19,16 @@ template<class T>
 class Array<T,
         typename std::enable_if<types::IsPrimitive<typename T::InnerType>::value>::type>  {
 public:
-    using ArrayType = typename T::CType;
+    using ArrayType = T;
+    using NativeArrayType = typename T::CType;
     using InnerType = typename T::InnerType::CType;
 
-    Array(JNIEnv* env, ArrayType instance)
+    Array(JNIEnv* env, NativeArrayType instance)
         : m_env(env)
         , m_instance(instance)
     {}
 
-    ArrayType array() {
+    NativeArrayType array() {
         return m_instance;
     }
 
@@ -50,29 +51,29 @@ public:
     }
 
     static Array newInstance(JNIEnv* env, jsize size) {
-        ArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size);
+        NativeArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size);
         throwIfPendingException(env);
         return {env, array};
     }
 
 private:
     JNIEnv* m_env;
-    ArrayType m_instance;
+    NativeArrayType m_instance;
 };
 
 template<class T>
 class Array<T,
         typename std::enable_if<types::IsObject<typename T::InnerType>::value>::type>  {
 public:
-    using ArrayType = typename T::CType;
+    using NativeArrayType = typename T::CType;
     using InnerType = typename T::InnerType::CType;
 
-    Array(JNIEnv* env, ArrayType instance)
+    Array(JNIEnv* env, NativeArrayType instance)
         : m_env(env)
         , m_instance(instance)
     {}
 
-    ArrayType array() {
+    NativeArrayType array() {
         return m_instance;
     }
 
@@ -94,14 +95,14 @@ public:
     }
 
     static Array newInstance(JNIEnv* env, jclass cls, jsize size) {
-        ArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size, cls, nullptr);
+        NativeArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size, cls, nullptr);
         throwIfPendingException(env);
         return {env, array};
     }
 
 private:
     JNIEnv* m_env;
-    ArrayType m_instance;
+    NativeArrayType m_instance;
 };
 
 using BooleanArray = Array<types::BooleanArray>;

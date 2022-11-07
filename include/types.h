@@ -73,4 +73,17 @@ struct IsObject : public std::false_type {};
 template<class NameType>
 struct IsObject<ObjectType<NameType>> : public std::true_type {};
 
+template<class T>
+struct IsArray : public std::false_type {};
+template<> struct IsArray<BooleanArray> : public std::true_type {};
+template<> struct IsArray<CharArray> : public std::true_type {};
+template<> struct IsArray<ByteArray> : public std::true_type {};
+template<> struct IsArray<ShortArray> : public std::true_type {};
+template<> struct IsArray<IntArray> : public std::true_type {};
+template<> struct IsArray<LongArray> : public std::true_type {};
+template<> struct IsArray<FloatArray> : public std::true_type {};
+template<> struct IsArray<DoubleArray> : public std::true_type {};
+template<class T>
+struct IsArray<ObjectArray<T>> : public std::true_type {};
+
 }
