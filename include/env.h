@@ -4,6 +4,7 @@
 
 #include "signatures.h"
 #include "class.h"
+#include "except.h"
 
 
 namespace jnikit {
@@ -17,7 +18,7 @@ public:
     template<class T>
     Class<T> getClass() {
         jclass cls = m_env->FindClass(types::Signature<T>()());
-        // TODO: CHECK ERROR
+        throwIfPendingException(m_env);
         return {m_env, cls};
     }
 

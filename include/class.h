@@ -6,6 +6,7 @@
 #include "types.h"
 #include "signatures.h"
 #include "functions.h"
+#include "except.h"
 
 
 namespace jnikit {
@@ -30,11 +31,7 @@ public:
         : m_env(env)
         , m_methodId(m_env->GetMethodID(cls, name, types::Signature<MethodType>()()))
     {
-        // TODO: CHECK FOR ERROR
-    }
-
-    jmethodID id() const {
-        return m_methodId;
+        throwIfPendingException(env);
     }
 
     ReturnType call(jobject instance, typename Args::CType... args) {
@@ -51,10 +48,10 @@ public:
     ReturnType callNonVirtual(jobject instance, typename Args::CType... args) {
         if constexpr (std::is_void_v<ReturnType>) {
             m_env->CallNonvirtualVoidMethod(instance, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
         } else {
             ReturnType result = (m_env->*(env::EnvFunctions<ReturnType>::CallNonVirtualMethod))(instance, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
             return result;
         }
     }
@@ -82,20 +79,16 @@ public:
         , m_cls(cls)
         , m_methodId(m_env->GetStaticMethodID(cls, name, types::Signature<MethodType>()()))
     {
-        // TODO: CHECK FOR ERROR
-    }
-
-    jmethodID id() const {
-        return m_methodId;
+        throwIfPendingException(env);
     }
 
     ReturnType call(typename Args::CType... args) {
         if constexpr (std::is_void_v<ReturnType>) {
             m_env->CallStaticVoidMethod(m_cls, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
         } else {
             ReturnType result = (m_env->*(env::EnvFunctions<ReturnType>::CallStaticMethod))(m_cls, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
             return result;
         }
     }
@@ -116,10 +109,6 @@ public:
         : m_env(env)
         , m_cls(cls)
     {}
-
-    jclass cls() const {
-        return m_cls;
-    }
 
     template<class T>
     Method<T> method(const char* name) {
