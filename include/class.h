@@ -11,14 +11,50 @@
 
 namespace jnikit {
 
-template<class _type>
+template<class T, class... Args>
+class Constructor;
+template<class T>
 class Method;
-template<class _type>
+template<class T>
 class StaticMethod;
-template<class _type>
+template<class T>
 class Field;
-template<class _type>
+template<class T>
 class StaticField;
+
+
+template<class T, class... Args>
+class Constructor {
+public:
+    using MethodType = jnikit::types::MethodType<types::Void(Args...)>;
+
+    Constructor(JNIEnv* env, jclass cls, jmethodID methodId)
+        : m_env(env)
+        , m_cls(cls)
+        , m_methodId(methodId)
+    {}
+
+    Constructor(JNIEnv* env, jclass cls)
+        : m_env(env)
+        , m_cls(cls)
+        , m_methodId(m_env->GetMethodID(cls, NAME, types::Signature<MethodType>()()))
+    {
+        throwIfPendingException(env);
+    }
+
+    jobject call(typename Args::CType... args) {
+        jobject instance = m_env->NewObject(m_cls, m_methodId, args...);
+        throwIfPendingException(m_env);
+        return instance;
+    }
+
+private:
+    static constexpr char NAME[] = "<init>";
+
+    JNIEnv* m_env;
+    jclass m_cls;
+    jmethodID m_methodId;
+};
 
 template<class R, class... Args>
 class Method<R(Args...)> {
@@ -180,6 +216,11 @@ public:
         : m_env(env)
         , m_cls(cls)
     {}
+
+    template<class... Args>
+    Constructor<CT, Args...> constructor() {
+        return Constructor<CT, Args...>{m_env, m_cls};
+    }
 
     template<class T>
     Method<T> method(const char* name) {
