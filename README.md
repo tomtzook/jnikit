@@ -28,7 +28,7 @@ JNIEXPORT jobjectArray JNICALL Java_package_MyClass_createArray
         
         arr.setElement(0, cls.newInstance<>());
         
-        return arr;
+        return arr.array();
     });
 }
 ```
