@@ -7,9 +7,9 @@
 
 namespace jnikit::types {
 
-template<typename _c_type>
+template<typename T>
 struct Type {
-    using CType = _c_type;
+    using CType = T;
 };
 
 using Boolean = Type<jboolean>;
@@ -23,14 +23,14 @@ using Double = Type<jdouble>;
 using Void = Type<void>;
 
 
-template<typename _name_type>
+template<typename NT>
 struct ObjectType : public Type<jobject> {
-    using NameType = _name_type;
+    using NameType = NT;
 };
 
-template<typename _c_type, typename _inner_type>
-struct ArrayType : public Type<_c_type> {
-    using InnerType = _inner_type;
+template<typename CT, typename IT>
+struct ArrayType : public Type<CT> {
+    using InnerType = IT;
 };
 
 using BooleanArray = ArrayType<jbooleanArray, Boolean>;
@@ -41,9 +41,8 @@ using IntArray = ArrayType<jintArray, Int>;
 using LongArray = ArrayType<jlongArray, Long>;
 using FloatArray = ArrayType<jfloatArray, Float>;
 using DoubleArray = ArrayType<jdoubleArray, Double>;
-template<typename _inner_type>
-using ObjectArray = ArrayType<jobjectArray, _inner_type>;
-
+template<typename InnerType>
+using ObjectArray = ArrayType<jobjectArray, InnerType>;
 
 template<typename R, typename... Args>
 struct MethodType;
@@ -58,50 +57,20 @@ struct MethodType<R(Args...)> {
     using name = jnikit::types::ObjectType<name##_nameholder>;
 
 
-DEFINE_OBJECT_TYPE(Object, "java/lang/Object")
-DEFINE_OBJECT_TYPE(String, "java/lang/String")
+template<class T>
+struct IsPrimitive : public std::false_type {};
+template<> struct IsPrimitive<Boolean> : public std::true_type {};
+template<> struct IsPrimitive<Char> : public std::true_type {};
+template<> struct IsPrimitive<Byte> : public std::true_type {};
+template<> struct IsPrimitive<Short> : public std::true_type {};
+template<> struct IsPrimitive<Int> : public std::true_type {};
+template<> struct IsPrimitive<Long> : public std::true_type {};
+template<> struct IsPrimitive<Float> : public std::true_type {};
+template<> struct IsPrimitive<Double> : public std::true_type {};
 
-
-/*
-
-template<class _name_type>
-struct ObjectType : Type<jobject> {
-    constexpr auto operator()() const {
-        return meta::concat(meta::StringLiteral<'L'>(), _name_type::Name()(), meta::StringLiteral<';'>());
-    }
-};
-
-template<class _ctype, class _inner_type>
-struct ArrayType : Type<_ctype> {
-    constexpr auto operator()() const {
-        return meta::concat(meta::StringLiteral<'['>(), _inner_type()());
-    }
-};
-
-using BooleanArray = ArrayType<jbooleanArray, Boolean>;
-using CharArray = ArrayType<jcharArray, Char>;
-using ByteArray = ArrayType<jbyteArray, Byte>;
-using ShortArray = ArrayType<jshortArray, Short>;
-using IntArray = ArrayType<jintArray, Int>;
-using LongArray = ArrayType<jlongArray, Long>;
-using FloatArray = ArrayType<jfloatArray, Float>;
-using DoubleArray = ArrayType<jdoubleArray, Double>;
-
-template<class _inner_type>
-struct ArrayType<jobjectArray, _inner_type> {
-    constexpr auto operator()() const {
-        return meta::concat(meta::StringLiteral<'['>(), _inner_type()());
-    }
-};
-
-template<class>
-struct MethodSignature;
-
-template<class R, class... Args>
-struct MethodSignature<R(Args...)> {
-    constexpr auto operator()() const {
-        return meta::concat(meta::StringLiteral<'('>(), Args()()..., meta::StringLiteral<')'>(), R()());
-    }
-};*/
+template<class T>
+struct IsObject : public std::false_type {};
+template<class NameType>
+struct IsObject<ObjectType<NameType>> : public std::true_type {};
 
 }

@@ -7,6 +7,7 @@
 #include "signatures.h"
 #include "functions.h"
 #include "except.h"
+#include "array.h"
 
 
 namespace jnikit {
@@ -211,6 +212,7 @@ template<class CT>
 class Class {
 public:
     using Type = CT;
+    using ArrayType = ObjectArray<CT>;
 
     Class(JNIEnv* env, jclass cls)
         : m_env(env)
@@ -265,6 +267,10 @@ public:
     jobject newInstance(typename Args::CType... args) {
         auto ctor = constructor<Args...>();
         return ctor.call(args...);
+    }
+
+    ArrayType newArray(jsize size) {
+        return ArrayType::newInstance(m_env, m_cls, size);
     }
 
 private:
