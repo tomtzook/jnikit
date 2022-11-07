@@ -242,6 +242,31 @@ public:
         return StaticField<T>{m_env, m_cls, name};
     }
 
+    template<class FT>
+    typename FT::CType getStaticField(const char* name) {
+        auto field = staticField<FT>(name);
+        return field.get();
+    }
+
+    template<class FT>
+    void setStaticField(const char* name, typename FT::CType value) {
+        auto field = staticField<FT>(name);
+        return field.set(value);
+    }
+
+    template<class R, class... Args>
+    typename R::CType callStaticMethod(const char* name, typename Args::CType... args) {
+        using t = R(Args...);
+        auto method = staticMethod<t>(name);
+        return method.call(args...);
+    }
+
+    template<class... Args>
+    jobject newInstance(typename Args::CType... args) {
+        auto ctor = constructor<Args...>();
+        return ctor.call(args...);
+    }
+
 private:
     JNIEnv* m_env;
     jclass m_cls;
