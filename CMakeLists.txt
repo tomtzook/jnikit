@@ -7,6 +7,7 @@ find_package(JNI REQUIRED)
 
 add_library(jnikit STATIC
         src/empty.cpp
+        src/except.cpp
 
         # for better IDE rendering
         include/except.h
@@ -15,7 +16,8 @@ add_library(jnikit STATIC
         include/signatures.h
         include/env.h
         include/class.h
-        include/functions.h include/exceptions.h src/except.cpp)
+        include/functions.h
+        include/exceptions.h)
 
 target_include_directories(jnikit PUBLIC
         ${JNI_INCLUDE_DIRS}

@@ -15,6 +15,10 @@ template<class _type>
 class Method;
 template<class _type>
 class StaticMethod;
+template<class _type>
+class Field;
+template<class _type>
+class StaticField;
 
 template<class R, class... Args>
 class Method<R(Args...)> {
@@ -23,13 +27,13 @@ public:
     using ReturnType = typename R::CType;
 
     Method(JNIEnv* env, jmethodID methodId)
-        : m_env(env)
-        , m_methodId(methodId)
+            : m_env(env)
+            , m_methodId(methodId)
     {}
 
     Method(JNIEnv* env, jclass cls, const char* name)
-        : m_env(env)
-        , m_methodId(m_env->GetMethodID(cls, name, types::Signature<MethodType>()()))
+            : m_env(env)
+            , m_methodId(m_env->GetMethodID(cls, name, types::Signature<MethodType>()()))
     {
         throwIfPendingException(env);
     }
@@ -37,10 +41,10 @@ public:
     ReturnType call(jobject instance, typename Args::CType... args) {
         if constexpr (std::is_void_v<ReturnType>) {
             m_env->CallVoidMethod(instance, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
         } else {
             ReturnType result = (m_env->*(env::EnvFunctions<ReturnType>::CallMethod))(instance, m_methodId, args...);
-            // TODO: CHECK FOR ERROR
+            throwIfPendingException(m_env);
             return result;
         }
     }
@@ -69,15 +73,15 @@ public:
     using ReturnType = typename R::CType;
 
     StaticMethod(JNIEnv* env, jclass cls, jmethodID methodId)
-        : m_env(env)
-        , m_cls(cls)
-        , m_methodId(methodId)
+            : m_env(env)
+            , m_cls(cls)
+            , m_methodId(methodId)
     {}
 
     StaticMethod(JNIEnv* env, jclass cls, const char* name)
-        : m_env(env)
-        , m_cls(cls)
-        , m_methodId(m_env->GetStaticMethodID(cls, name, types::Signature<MethodType>()()))
+            : m_env(env)
+            , m_cls(cls)
+            , m_methodId(m_env->GetStaticMethodID(cls, name, types::Signature<MethodType>()()))
     {
         throwIfPendingException(env);
     }
@@ -100,10 +104,77 @@ private:
 };
 
 
-template<class _type>
+template<class T>
+class Field {
+public:
+    using Type = typename T::CType;
+
+    Field(JNIEnv* env, jfieldID fieldId)
+        : m_env(env)
+        , m_fieldId(fieldId)
+    {}
+
+    Field(JNIEnv* env, jclass cls, const char* name)
+        : m_env(env)
+        , m_fieldId(env->GetFieldID(cls, name, types::Signature<T>()()))
+    {
+        throwIfPendingException(env);
+    }
+
+    Type get(jobject instance) {
+        Type result = (m_env->*(env::EnvFunctions<Type>::GetField))(instance, m_fieldId);
+        throwIfPendingException(m_env);
+        return result;
+    }
+
+    void set(jobject instance, Type value) {
+        (m_env->*(env::EnvFunctions<Type>::SetField))(instance, m_fieldId, value);
+        throwIfPendingException(m_env);
+    }
+
+private:
+    JNIEnv* m_env;
+    jfieldID m_fieldId;
+};
+
+template<class T>
+class StaticField {
+public:
+    using Type = typename T::CType;
+
+    StaticField(JNIEnv* env, jclass cls, jfieldID fieldId)
+        : m_env(env)
+        , m_cls(cls)
+        , m_fieldId(fieldId)
+    {}
+
+    StaticField(JNIEnv* env, jclass cls, const char* name)
+        : m_env(env)
+        , m_cls(cls)
+        , m_fieldId(env->GetStaticFieldID(cls, name, types::Signature<T>()()))
+    {}
+
+    Type get() {
+        Type result = (m_env->*(env::EnvFunctions<Type>::GetStaticField))(m_cls, m_fieldId);
+        throwIfPendingException(m_env);
+        return result;
+    }
+
+    void set(Type value) {
+        (m_env->*(env::EnvFunctions<Type>::SetStaticField))(m_cls, m_fieldId, value);
+        throwIfPendingException(m_env);
+    }
+
+private:
+    JNIEnv* m_env;
+    jclass m_cls;
+    jfieldID m_fieldId;
+};
+
+template<class CT>
 class Class {
 public:
-    using Type = _type;
+    using Type = CT;
 
     Class(JNIEnv* env, jclass cls)
         : m_env(env)
@@ -118,6 +189,16 @@ public:
     template<class T>
     StaticMethod<T> staticMethod(const char* name) {
         return StaticMethod<T>{m_env, m_cls, name};
+    }
+
+    template<class T>
+    Field<T> field(const char* name) {
+        return Field<T>{m_env, m_cls, name};
+    }
+
+    template<class T>
+    StaticField<T> staticField(const char* name) {
+        return StaticField<T>{m_env, m_cls, name};
     }
 
 private:
