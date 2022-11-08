@@ -43,6 +43,12 @@ public:
         throwIfPendingException(env);
     }
 
+    Constructor(Constructor& other) = delete;
+    Constructor(Constructor&& other) = delete;
+
+    Constructor& operator=(Constructor& other) = delete;
+    Constructor& operator=(Constructor&& other) = delete;
+
     jobject call(typename Args::CType... args) {
         jobject instance = m_env->NewObject(m_cls, m_methodId, args...);
         throwIfPendingException(m_env);
@@ -74,6 +80,12 @@ public:
     {
         throwIfPendingException(env);
     }
+
+    Method(Method& other) = delete;
+    Method(Method&& other) = delete;
+
+    Method& operator=(Method& other) = delete;
+    Method& operator=(Method&& other) = delete;
 
     ReturnType call(jobject instance, typename Args::CType... args) {
         if constexpr (std::is_void_v<ReturnType>) {
@@ -123,6 +135,12 @@ public:
         throwIfPendingException(env);
     }
 
+    StaticMethod(StaticMethod& other) = delete;
+    StaticMethod(StaticMethod&& other) = delete;
+
+    StaticMethod& operator=(StaticMethod& other) = delete;
+    StaticMethod& operator=(StaticMethod&& other) = delete;
+
     ReturnType call(typename Args::CType... args) {
         if constexpr (std::is_void_v<ReturnType>) {
             m_env->CallStaticVoidMethod(m_cls, m_methodId, args...);
@@ -158,6 +176,12 @@ public:
         throwIfPendingException(env);
     }
 
+    Field(Field& other) = delete;
+    Field(Field&& other) = delete;
+
+    Field& operator=(Field& other) = delete;
+    Field& operator=(Field&& other) = delete;
+
     Type get(jobject instance) {
         Type result = (m_env->*(env::EnvFunctions<Type>::GetField))(instance, m_fieldId);
         throwIfPendingException(m_env);
@@ -191,6 +215,12 @@ public:
         , m_fieldId(env->GetStaticFieldID(cls, name, types::Signature<T>()()))
     {}
 
+    StaticField(StaticField& other) = delete;
+    StaticField(StaticField&& other) = delete;
+
+    StaticField& operator=(StaticField& other) = delete;
+    StaticField& operator=(StaticField&& other) = delete;
+
     Type get() {
         Type result = (m_env->*(env::EnvFunctions<Type>::GetStaticField))(m_cls, m_fieldId);
         throwIfPendingException(m_env);
@@ -218,6 +248,12 @@ public:
         : m_env(env)
         , m_cls(cls)
     {}
+
+    Class(Class& other) = delete;
+    Class(Class&& other) = delete;
+
+    Class& operator=(Class& other) = delete;
+    Class& operator=(Class&& other) = delete;
 
     template<class... Args>
     Constructor<CT, Args...> constructor() {

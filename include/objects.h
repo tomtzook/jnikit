@@ -14,6 +14,11 @@ public:
         : m_cls(env, cls)
         , m_instance(instance)
     {}
+    Object(Object& other) = delete;
+    Object(Object&& other) = delete;
+
+    Object& operator=(Object& other) = delete;
+    Object& operator=(Object&& other) = delete;
 
     jobject object() {
         return m_instance;

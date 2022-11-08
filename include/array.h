@@ -28,6 +28,12 @@ public:
         , m_instance(instance)
     {}
 
+    Array(Array& other) = delete;
+    Array(Array&& other) = delete;
+
+    Array& operator=(Array& other) = delete;
+    Array& operator=(Array&& other) = delete;
+
     NativeArrayType array() {
         return m_instance;
     }
@@ -72,6 +78,12 @@ public:
         : m_env(env)
         , m_instance(instance)
     {}
+
+    Array(Array& other) = delete;
+    Array(Array&& other) = delete;
+
+    Array& operator=(Array& other) = delete;
+    Array& operator=(Array&& other) = delete;
 
     NativeArrayType array() {
         return m_instance;
