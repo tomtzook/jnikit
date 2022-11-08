@@ -11,7 +11,8 @@ template<class T>
 class Object {
 public:
     Object(JNIEnv* env, jclass cls, jobject instance)
-        : m_cls(env, cls)
+        : m_env(env)
+        , m_cls(env, cls)
         , m_instance(instance)
     {}
     Object(Object& other) = delete;
@@ -19,6 +20,15 @@ public:
 
     Object& operator=(Object& other) = delete;
     Object& operator=(Object&& other) = delete;
+
+    bool operator==(jobject obj) const {
+        return m_env->IsSameObject(m_instance, obj);
+    }
+
+    template<class T2>
+    bool operator==(Object<T2>& obj) const {
+        return m_env->IsSameObject(m_instance, obj.m_instance);
+    }
 
     jobject object() {
         return m_instance;
@@ -48,6 +58,7 @@ public:
     }
 
 private:
+    JNIEnv* m_env;
     Class<T> m_cls;
     jobject m_instance;
 };
