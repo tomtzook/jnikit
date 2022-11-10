@@ -30,4 +30,14 @@ R context(JNIEnv* env, std::function<R(Env&)> func) {
     }
 }
 
+template<>
+void context(JNIEnv* env, std::function<void(Env&)> func) {
+    try {
+        Env jnikitEnv(env);
+        func(jnikitEnv);
+    } catch (const PendingJavaException&) {
+        return;
+    }
+}
+
 }
