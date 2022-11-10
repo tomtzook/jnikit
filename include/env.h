@@ -44,6 +44,18 @@ public:
         return {m_env, cls};
     }
 
+    void throwException(jthrowable ex) {
+        m_env->Throw(ex);
+        throwIfPendingException(m_env);
+    }
+
+    template<class T>
+    void throwException(const char* msg) {
+        auto cls = getClass<T>();
+        m_env->ThrowNew(cls.classObj(), msg);
+        throwIfPendingException(m_env);
+    }
+
 private:
     JNIEnv* m_env;
 };

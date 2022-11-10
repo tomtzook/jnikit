@@ -255,6 +255,10 @@ public:
     Class& operator=(Class& other) = delete;
     Class& operator=(Class&& other) = delete;
 
+    jclass classObj() const {
+        return m_cls;
+    }
+
     template<class... Args>
     Constructor<CT, Args...> constructor() {
         return Constructor<CT, Args...>{m_env, m_cls};
