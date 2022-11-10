@@ -57,7 +57,7 @@ public:
     }
 
     template<class T, class... Args>
-    void throwException(Args... args) {
+    void throwException(typename Args::CType... args) {
         auto cls = getClass<T>();
         auto instance = cls.template newInstance<Args...>(args...);
         throwException(reinterpret_cast<jthrowable>(instance));
