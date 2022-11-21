@@ -56,6 +56,11 @@ public:
         throwIfPendingException(m_env);
     }
 
+    void fill(InnerType* valueArr, size_t size) {
+        (m_env->*(env::EnvFunctions<InnerType>::SetArrayRegion))(m_instance, 0, size, valueArr);
+        throwIfPendingException(m_env);
+    }
+
     static Array newInstance(JNIEnv* env, jsize size) {
         NativeArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size);
         throwIfPendingException(env);
