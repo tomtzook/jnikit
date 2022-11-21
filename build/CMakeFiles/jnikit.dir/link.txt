@@ -1,0 +1,2 @@
+/usr/bin/ar qc libjnikit.a  CMakeFiles/jnikit.dir/src/empty.cpp.o CMakeFiles/jnikit.dir/src/except.cpp.o
+/usr/bin/ranlib libjnikit.a

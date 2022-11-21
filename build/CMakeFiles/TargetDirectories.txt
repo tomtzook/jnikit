@@ -1,0 +1,3 @@
+/home/tomtzook/projects/tryouts/jnikit/build/CMakeFiles/rebuild_cache.dir
+/home/tomtzook/projects/tryouts/jnikit/build/CMakeFiles/edit_cache.dir
+/home/tomtzook/projects/tryouts/jnikit/build/CMakeFiles/jnikit.dir
