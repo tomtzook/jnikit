@@ -7,6 +7,7 @@
 #include "except.h"
 #include "array.h"
 #include "types.h"
+#include "objects.h"
 
 
 namespace jnikit {
@@ -42,6 +43,13 @@ public:
         jclass cls = m_env->FindClass(types::Signature<T>()());
         throwIfPendingException(m_env);
         return {m_env, cls};
+    }
+
+    template<class T,
+            typename = typename std::enable_if<types::IsObject<T>::value>::type>
+    Object<T> wrap(jobject instance) {
+        auto cls = getClass<T>();
+        return {m_env, cls.classObj(), instance};
     }
 
     void throwException(jthrowable ex) {
