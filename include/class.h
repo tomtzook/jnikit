@@ -242,7 +242,7 @@ template<class CT>
 class Class {
 public:
     using Type = CT;
-    using ArrayType = ObjectArray<CT>;
+    using ArrayType = Array<CT>;
 
     Class(JNIEnv* env, jclass cls)
         : m_env(env)

@@ -32,7 +32,7 @@ public:
 
     template<class T,
             typename = typename std::enable_if<types::IsObject<T>::value>::type>
-    ObjectArray<T> newObjectArray(jsize size) {
+    Array<T> newObjectArray(jsize size) {
         auto cls = getClass<T>();
         return cls.newArray(size);
     }

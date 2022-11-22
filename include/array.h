@@ -20,7 +20,7 @@ class Array<T,
         typename std::enable_if<types::IsPrimitive<T>::value>::type>  {
 public:
     using ArrayType = typename types::ToArrayType<T>::Type;
-    using NativeArrayType = typename T::CType;
+    using NativeArrayType = typename ArrayType::CType;
     using InnerType = typename T::CType;
 
     Array(JNIEnv* env, NativeArrayType instance)
@@ -112,7 +112,7 @@ public:
     }
 
     static Array newInstance(JNIEnv* env, jclass cls, jsize size) {
-        NativeArrayType array = (env->*(env::EnvFunctions<InnerType>::NewArray))(size, cls, nullptr);
+        NativeArrayType array = (env->*(env::EnvFunctions<jobject>::NewArray))(size, cls, nullptr);
         throwIfPendingException(env);
         return {env, array};
     }
