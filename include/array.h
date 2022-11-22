@@ -76,8 +76,8 @@ template<class T>
 class Array<T,
         typename std::enable_if<types::IsObject<T>::value>::type>  {
 public:
-    using NativeArrayType = typename T::CType;
-    using InnerType = typename T::InnerType::CType;
+    using NativeArrayType = typename types::ObjectArray<T>::CType;
+    using InnerType = typename T::CType;
 
     Array(JNIEnv* env, NativeArrayType instance)
         : m_env(env)
@@ -121,17 +121,5 @@ private:
     JNIEnv* m_env;
     NativeArrayType m_instance;
 };
-
-using BooleanArray = Array<types::BooleanArray>;
-using CharArray = Array<types::CharArray>;
-using ByteArray = Array<types::ByteArray>;
-using ShortArray = Array<types::ShortArray>;
-using IntArray = Array<types::IntArray>;
-using LongArray = Array<types::LongArray>;
-using FloatArray = Array<types::FloatArray>;
-using DoubleArray = Array<types::DoubleArray>;
-
-template<class T>
-using ObjectArray = Array<types::ObjectArray<T>>;
 
 }

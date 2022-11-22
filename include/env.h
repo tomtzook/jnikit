@@ -25,7 +25,7 @@ public:
     Env& operator=(Env&& other) = delete;
 
     template<class T,
-            typename = typename std::enable_if<types::IsArray<T>::value>::type>
+            typename = typename std::enable_if<types::IsPrimitive<T>::value>::type>
     Array<T> newArray(jsize size) {
         return Array<T>::newInstance(m_env, size);
     }
