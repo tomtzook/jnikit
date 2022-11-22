@@ -44,6 +44,17 @@ using DoubleArray = ArrayType<jdoubleArray, Double>;
 template<typename InnerType>
 using ObjectArray = ArrayType<jobjectArray, InnerType>;
 
+template<typename IT>
+struct ToArrayType {};
+template<> struct ToArrayType<Boolean> { using Type = BooleanArray; };
+template<> struct ToArrayType<Char> { using Type = CharArray; };
+template<> struct ToArrayType<Byte> { using Type = ByteArray; };
+template<> struct ToArrayType<Short> { using Type = ShortArray; };
+template<> struct ToArrayType<Int> { using Type = IntArray; };
+template<> struct ToArrayType<Long> { using Type = LongArray; };
+template<> struct ToArrayType<Float> { using Type = FloatArray; };
+template<> struct ToArrayType<Double> { using Type = DoubleArray; };
+
 template<typename R, typename... Args>
 struct MethodType;
 
@@ -72,6 +83,8 @@ template<class T>
 struct IsObject : public std::false_type {};
 template<class NameType>
 struct IsObject<ObjectType<NameType>> : public std::true_type {};
+template<typename CT, typename IT>
+struct IsObject<ArrayType<CT, IT>> : public std::true_type {};
 
 template<class T>
 struct IsArray : public std::false_type {};

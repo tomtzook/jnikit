@@ -17,11 +17,11 @@ class Array;
 
 template<class T>
 class Array<T,
-        typename std::enable_if<types::IsPrimitive<typename T::InnerType>::value>::type>  {
+        typename std::enable_if<types::IsPrimitive<T>::value>::type>  {
 public:
-    using ArrayType = T;
+    using ArrayType = typename types::ToArrayType<T>::Type;
     using NativeArrayType = typename T::CType;
-    using InnerType = typename T::InnerType::CType;
+    using InnerType = typename T::CType;
 
     Array(JNIEnv* env, NativeArrayType instance)
         : m_env(env)
@@ -74,12 +74,7 @@ private:
 
 template<class T>
 class Array<T,
-        typename std::enable_if<
-                std::disjunction<
-                        typename types::IsObject<typename T::InnerType>::value,
-                        typename types::IsArray<T>::value
-                >::value
-        >::type>  {
+        typename std::enable_if<types::IsObject<T>::value>::type>  {
 public:
     using NativeArrayType = typename T::CType;
     using InnerType = typename T::InnerType::CType;
