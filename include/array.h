@@ -100,14 +100,14 @@ public:
         return size;
     }
 
-    InnerType getElement(jsize index) {
-        InnerType t = (m_env->*(env::EnvFunctions<InnerType>::GetArrayElement))(m_instance, index);
+    jobject getElement(jsize index) {
+        jobject t = (m_env->*(env::EnvFunctions<jobject>::GetArrayElement))(m_instance, index);
         throwIfPendingException(m_env);
         return t;
     }
 
-    void setElement(jsize index, InnerType& value) {
-        (m_env->*(env::EnvFunctions<InnerType>::SetArrayElement))(m_instance, index, value);
+    void setElement(jsize index, jobject& value) {
+        (m_env->*(env::EnvFunctions<jobject>::SetArrayElement))(m_instance, index, value);
         throwIfPendingException(m_env);
     }
 
