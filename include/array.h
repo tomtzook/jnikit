@@ -74,7 +74,12 @@ private:
 
 template<class T>
 class Array<T,
-        typename std::enable_if<types::IsObject<typename T::InnerType>::value>::type>  {
+        typename std::enable_if<
+                std::disjunction<
+                        typename types::IsObject<typename T::InnerType>::value,
+                        typename types::IsArray<T>::value
+                >::value
+        >::type>  {
 public:
     using NativeArrayType = typename T::CType;
     using InnerType = typename T::InnerType::CType;
