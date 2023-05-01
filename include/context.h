@@ -26,7 +26,7 @@ R context(JNIEnv* env, std::function<R(Env&)> func) {
     } catch (const PendingJavaException&) {
         if constexpr (std::is_void_v<R>) {
             return;
-        } else if constexpr (std::is_integral_v<R>) {
+        } else if constexpr (std::is_integral_v<R> || std::is_floating_point_v<R>) {
             return 0;
         } else if constexpr (std::is_pointer_v<R>) {
             return nullptr;
